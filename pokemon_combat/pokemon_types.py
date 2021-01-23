@@ -7,3 +7,5 @@ class PokemonType(Enum):
     WATER = auto()
     GROUND = auto()
     ROCK = auto()
+    STEEL = auto()
+    FIGHTING = auto()
