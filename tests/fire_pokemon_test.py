@@ -10,8 +10,7 @@ def test_init():
     assert pokemon.name == name
     assert pokemon.gender == gender
     assert pokemon.level == 0
-    assert pokemon.weakness == (PokemonType.WATER, )
-    assert pokemon.strength == (PokemonType.ICE, PokemonType.GROUND, PokemonType.ROCK)
+    assert pokemon.weakness == (PokemonType.WATER, PokemonType.GROUND, PokemonType.ROCK)
 
 
 def test_str():
