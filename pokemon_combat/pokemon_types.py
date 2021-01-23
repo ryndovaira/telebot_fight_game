@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 
-class PokemonTypes(Enum):
+class PokemonType(Enum):
     FIRE = auto()
     ICE = auto()
     WATER = auto()
