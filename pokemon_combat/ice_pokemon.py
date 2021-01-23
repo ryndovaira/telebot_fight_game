@@ -9,4 +9,4 @@ class IcePokemon(Pokemon):
         self.weakness = (PokemonType.FIRE, PokemonType.STEEL, PokemonType.FIGHTING, PokemonType.ROCK)
 
     def __str__(self):
-        return f"Type: Fire | {super().__str__()}"
+        return f"Type: Ice | {super().__str__()}"

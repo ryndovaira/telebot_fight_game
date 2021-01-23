@@ -19,4 +19,4 @@ def test_str():
     gender = Gender.MALE
     pokemon = IcePokemon(name=name, gender=gender)
 
-    assert str(pokemon) == f"Type: Fire | Name: {name} | Gender: {gender} | Level: 0 | HP: 100"
+    assert str(pokemon) == f"Type: Ice | Name: {name} | Gender: {gender} | Level: 0 | HP: 100"
