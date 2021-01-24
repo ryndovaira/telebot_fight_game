@@ -1,4 +1,5 @@
 from pokemon_combat.gender import Gender
+from pokemon_combat.state import State
 from pokemon_combat.pokemon import Pokemon
 
 
@@ -10,6 +11,7 @@ def test_init():
     assert pokemon.gender == gender
     assert pokemon.level == 0
     assert pokemon.hp == 100
+    assert pokemon.state == State.INIT
 
 
 def test_str():

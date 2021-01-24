@@ -1,6 +1,7 @@
 from pokemon_combat.gender import Gender
-from pokemon_combat.water_pokemon import WaterPokemon
+from pokemon_combat.state import State
 from pokemon_combat.pokemon_types import PokemonType
+from pokemon_combat.water_pokemon import WaterPokemon
 
 
 def test_init():
@@ -11,6 +12,7 @@ def test_init():
     assert pokemon.gender == gender
     assert pokemon.level == 0
     assert pokemon.hp == 100
+    assert pokemon.state == State.INIT
     assert pokemon.weakness == (PokemonType.ELECTRIC, PokemonType.GRASS)
 
 
