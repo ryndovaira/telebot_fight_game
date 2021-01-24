@@ -1,5 +1,5 @@
 from pokemon_combat.fire_pokemon import FirePokemon
-from pokemon_combat.pokemon import Gender
+from pokemon_combat.gender import Gender
 from pokemon_combat.pokemon_types import PokemonType
 
 

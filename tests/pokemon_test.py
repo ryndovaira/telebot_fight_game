@@ -1,4 +1,5 @@
-from pokemon_combat.pokemon import Pokemon, Gender
+from pokemon_combat.gender import Gender
+from pokemon_combat.pokemon import Pokemon
 
 
 def test_init():

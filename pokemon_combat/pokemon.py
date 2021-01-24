@@ -1,10 +1,6 @@
-from enum import Enum
+from random import randint
 
-
-class Gender(Enum):
-    GENDERLESS = 0
-    MALE = 1
-    FEMALE = 2
+from pokemon_combat.gender import Gender
 
 
 class Pokemon:
