@@ -1,6 +1,6 @@
 from pokemon_combat.pokemon_type import PokemonType
 
-pokemon_advantage_by_type = {
+pokemon_weaknesses_by_type = {
     PokemonType.NORMAL: (),
     PokemonType.FIRE: (),
     PokemonType.WATER: (),
