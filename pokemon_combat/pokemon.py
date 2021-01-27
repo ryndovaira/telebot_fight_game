@@ -2,6 +2,7 @@ from random import randint
 
 from pokemon_combat.gender import Gender
 from pokemon_combat.state import State
+from pokemon_combat.pokemon_type import PokemonType
 
 
 class Pokemon:

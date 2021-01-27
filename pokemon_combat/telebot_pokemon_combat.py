@@ -2,7 +2,7 @@ import configparser
 import telebot
 from telebot import types
 
-from pokemon_combat.pokemon_types import PokemonType
+from pokemon_combat.pokemon_type import PokemonType
 
 config = configparser.ConfigParser()
 config.read('telebot_config.ini')
