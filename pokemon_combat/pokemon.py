@@ -1,8 +1,6 @@
-from random import randint
-
-from pokemon_combat.gender import Gender
-from pokemon_combat.state import State
+from pokemon_combat.body_part import BodyPart
 from pokemon_combat.pokemon_type import PokemonType
+from pokemon_combat.pokemon_types_weaknesses import pokemon_defence_weaknesses_by_type as weaknesses
 
 
 class Pokemon:
@@ -10,14 +8,26 @@ class Pokemon:
         self.level = 0  # TODO: как увеличивать уровни?
         self.name = name  # имя покемона
         self.type = pokemon_type  # тип покемона (вода, огонь ...)
-        self.hp = 100  # здоровье или очки жизни (hit points)
-        self.state = State.INIT  # текущее состояние (начальное, удар, защита)
+        self.defence_weaknesses = weaknesses[pokemon_type]      # слабости при защите для данного типа
+        self.hp = 100  # TODO: здоровье или очки жизни (hit points)
+        self.defense = BodyPart.NOTHING     # что защищаем?
+        self.attack = BodyPart.NOTHING      # куда атакуем?
+        self.hit_power = self.level * 2    # TODO: рассчитать мощность удара
 
     def __str__(self):
         return f"Name: {self.name} | Type: {self.type} | Level: {self.level} | HP: {self.hp}"
 
-    def hit(self):
-        return randint(self.level + 1, self.level + 5) + (1 if self.gender == Gender.MALE else 0)
+    def next_step(self, defense_body_part: BodyPart, attack_body_part: BodyPart):
+        self.defense = defense_body_part
+        self.attack = attack_body_part
 
-    def defense(self):
-        return randint(self.level + 1, self.level + 5) + (1 if self.gender == Gender.FEMALE else 0)
+    def get_hit(self, opponent_attack_body_part: BodyPart, opponent_hit_power: int):
+        if self.defense == opponent_attack_body_part:
+            return f"{opponent_attack_body_part} has defensed!"
+        else:
+            self.hp -= opponent_hit_power
+            if self.hp > 0:
+                return f"Hurt but not defeated! HP: {self.hp}"
+            else:
+                return f"Defeated!"
+
