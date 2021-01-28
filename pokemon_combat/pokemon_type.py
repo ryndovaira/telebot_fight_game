@@ -23,3 +23,11 @@ class PokemonType(Enum):
     DARK = auto()
     STEEL = auto()
     FAIRY = auto()
+
+    @classmethod
+    def min_index(cls):
+        return cls.NORMAL.value
+
+    @classmethod
+    def max_index(cls):
+        return cls.FAIRY.value
