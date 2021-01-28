@@ -1,3 +1,4 @@
+from pokemon_combat.state import State
 from pokemon_combat.body_part import BodyPart
 from pokemon_combat.pokemon_type import PokemonType
 from pokemon_combat.pokemon_types_weaknesses import pokemon_defence_weaknesses_by_type as weaknesses
@@ -13,9 +14,10 @@ class Pokemon:
         self.defense = BodyPart.NOTHING     # что защищаем?
         self.attack = BodyPart.NOTHING      # куда атакуем?
         self.hit_power = self.level * 2    # TODO: рассчитать мощность удара
+        self.state = State.READY
 
     def __str__(self):
-        return f"Name: {self.name} | Type: {self.type} | Level: {self.level} | HP: {self.hp}"
+        return f"Name: {self.name} | Type: {self.type} | Level: {self.level} | HP: {self.hp} | State: {self.state}"
 
     def next_step(self, defense_body_part: BodyPart, attack_body_part: BodyPart):
         self.defense = defense_body_part
@@ -29,5 +31,6 @@ class Pokemon:
             if self.hp > 0:
                 return f"Hurt but not defeated! HP: {self.hp}"
             else:
+                self.state = State.DEFEATED
                 return f"Defeated!"
 

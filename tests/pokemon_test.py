@@ -1,3 +1,4 @@
+from pokemon_combat.state import State
 from pokemon_combat.body_part import BodyPart
 from pokemon_combat.pokemon_type import PokemonType
 from pokemon_combat.pokemon_types_weaknesses import pokemon_defence_weaknesses_by_type as weaknesses
@@ -16,6 +17,7 @@ def test_init():
     assert pokemon.hp == 100
     assert pokemon.defense == BodyPart.NOTHING
     assert pokemon.attack == BodyPart.NOTHING
+    assert pokemon.state == State.READY
 
 
 def test_str():
@@ -24,4 +26,4 @@ def test_str():
 
     pokemon = Pokemon(name=name, pokemon_type=pokemon_type)
 
-    assert str(pokemon) == f"Name: {name} | Type: {pokemon_type} | Level: 0 | HP: 100"
+    assert str(pokemon) == f"Name: {name} | Type: {pokemon_type} | Level: 0 | HP: 100 | State: {State.READY}"

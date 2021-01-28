@@ -1,7 +1,6 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class State(Enum):
-    INIT = 0
-    HIT = 1
-    DEFENCE = 2
+    READY = auto()
+    DEFEATED = auto()
