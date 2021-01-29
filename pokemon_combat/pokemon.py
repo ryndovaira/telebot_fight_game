@@ -13,7 +13,7 @@ class Pokemon:
         self.hp = 100  # TODO: здоровье или очки жизни (hit points)
         self.defense = BodyPart.NOTHING     # что защищаем?
         self.attack = BodyPart.NOTHING      # куда атакуем?
-        self.hit_power = self.level * 2    # TODO: рассчитать мощность удара
+        self.hit_power = (self.level + 1) * 5    # TODO: рассчитать мощность удара
         self.state = State.READY
 
     def __str__(self):
@@ -27,6 +27,7 @@ class Pokemon:
         if self.defense == opponent_attack_body_part:
             return f"{opponent_attack_body_part} has defensed!"
         else:
+            # TODO: Use pokemon types
             self.hp -= opponent_hit_power
             if self.hp > 0:
                 return f"Hurt but not defeated! HP: {self.hp}"

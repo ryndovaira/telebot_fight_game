@@ -6,6 +6,7 @@ from pokemon_combat.body_part import BodyPart
 from pokemon_combat.pokemon import Pokemon
 from pokemon_combat.pokemon_bot import PokemonBot
 from pokemon_combat.pokemon_type import PokemonType
+from pokemon_combat.state import State
 
 config = configparser.ConfigParser()
 config.read('telebot_config.ini')
@@ -65,7 +66,7 @@ def query_handler(call):
     bot.register_next_step_handler(call.message, user_pokemon_name, pokemon_type=PokemonType(pokemon_type_id))
 
 
-def user_pokemon_name(message, pokemon_type):
+def user_pokemon_name(message, pokemon_type: PokemonType):
     global bot_state
     # {user_id: {'user_pokemon': pokemon_obj, 'rand_pokemon': rand_player_obj}}
     bot_state[message.from_user.id] = {
@@ -75,16 +76,18 @@ def user_pokemon_name(message, pokemon_type):
     }
 
     bot.send_message(message.chat.id,
-                     f"<b>You choose</b>\n{bot_state[message.from_user.id]['user_pokemon']}",
+                     f"<b>Your choose</b>\n{bot_state[message.from_user.id]['user_pokemon']}",
                      parse_mode='html')
 
     bot.send_message(message.chat.id,
-                     f"<b>Bot choose</b>\n{bot_state[message.from_user.id]['rand_pokemon']}",
+                     f"<b>Bot's choose</b>\n{bot_state[message.from_user.id]['rand_pokemon']}",
                      parse_mode='html')
 
-    # TODO: Move this part?
     bot.send_message(message.chat.id, "Starting game...")
+    game_next_step_defend(message)
 
+
+def game_next_step_defend(message):
     body_part_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True,
                                                    one_time_keyboard=True)
     body_part_keyboard.row(*[types.KeyboardButton(body_part.name) for body_part in BodyPart])
@@ -109,9 +112,46 @@ def game_next_step_attack(message):
     bot.register_next_step_handler(message, game_next_step, defenced_body_part=message.text)
 
 
-def game_next_step(message, defenced_body_part):
+def game_next_step(message, defenced_body_part: str):
     attack_body_part = message.text
-    ...
+
+    global bot_state
+    user_pokemon = bot_state[message.from_user.id]['user_pokemon']
+    rand_pokemon = bot_state[message.from_user.id]['rand_pokemon']
+
+    user_pokemon.next_step(defense_body_part=BodyPart[defenced_body_part],
+                           attack_body_part=BodyPart[attack_body_part])
+    rand_pokemon.next_step()
+
+    # TODO: player's pokemon is always the first attacker or not?
+    rand_pokemon_hit_comments = rand_pokemon.get_hit(opponent_attack_body_part=user_pokemon.attack,
+                                                     opponent_hit_power=user_pokemon.hit_power)
+    bot.send_message(message.chat.id,
+                     f"<b>Bot's pokemon</b>:\n{rand_pokemon_hit_comments}",
+                     parse_mode='html')
+
+    user_pokemon_hit_comments = user_pokemon.get_hit(opponent_attack_body_part=rand_pokemon.attack,
+                                                     opponent_hit_power=rand_pokemon.hit_power)
+    bot.send_message(message.chat.id,
+                     f"<b>Your pokemon</b>:\n{user_pokemon_hit_comments}",
+                     parse_mode='html')
+
+    bot.send_message(message.chat.id,
+                     f"<b>Your pokemon</b>\n{user_pokemon}",
+                     parse_mode='html')
+
+    bot.send_message(message.chat.id,
+                     f"<b>Bot's pokemon</b>\n{rand_pokemon}",
+                     parse_mode='html')
+
+    if user_pokemon.state != State.READY and rand_pokemon.state == State.READY:
+        bot.send_message(message.chat.id, "You lose...\n\n/start for a new game")
+    elif user_pokemon.state == State.READY and rand_pokemon.state != State.READY:
+        bot.send_message(message.chat.id, "You win!\n\n/start for a new game")
+    elif user_pokemon.state == State.READY and rand_pokemon.state != State.READY:
+        bot.send_message(message.chat.id, "Standoff!\n\n/start for a new game")
+    elif user_pokemon.state == State.READY and rand_pokemon.state == State.READY:
+        game_next_step_defend(message)
 
 
 if __name__ == '__main__':
