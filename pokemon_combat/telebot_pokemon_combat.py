@@ -2,6 +2,7 @@ import configparser
 import telebot
 from telebot import types
 
+from pokemon_combat.body_part import BodyPart
 from pokemon_combat.pokemon import Pokemon
 from pokemon_combat.pokemon_bot import PokemonBot
 from pokemon_combat.pokemon_type import PokemonType
@@ -80,11 +81,36 @@ def user_pokemon_name(message, pokemon_type):
     bot.send_message(message.chat.id,
                      f"<b>Bot choose</b>\n{bot_state[message.from_user.id]['rand_pokemon']}",
                      parse_mode='html')
-    ...
+
+    # TODO: Move this part?
+    bot.send_message(message.chat.id, "Starting game...")
+
+    body_part_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True,
+                                                   one_time_keyboard=True)
+    body_part_keyboard.row(*[types.KeyboardButton(body_part.name) for body_part in BodyPart])
+
+    bot.send_message(message.chat.id,
+                     "What pokemon's body part do you want to defend?",
+                     reply_markup=body_part_keyboard)
+
+    bot.register_next_step_handler(message, game_next_step_attack)
 
 
-@bot.callback_query_handler(func=lambda call: True)
-def query_handler(call):
+def game_next_step_attack(message):
+    body_part_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True,
+                                                   one_time_keyboard=True)
+    body_part_keyboard.row(*[types.KeyboardButton(body_part.name) for body_part in BodyPart])
+
+    bot.send_message(message.chat.id,
+                     "What pokemon's body part do you want to attack?",
+                     reply_markup=body_part_keyboard)
+
+    # TODO: Check non-keyboard answer
+    bot.register_next_step_handler(message, game_next_step, defenced_body_part=message.text)
+
+
+def game_next_step(message, defenced_body_part):
+    attack_body_part = message.text
     ...
 
 
