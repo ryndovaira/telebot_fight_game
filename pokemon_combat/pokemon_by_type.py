@@ -1,6 +1,6 @@
 from pokemon_combat.pokemon_type import PokemonType
 
-pokemon_defence_weaknesses_by_type = {
+pokemon_by_type = {
     # https://pokemondb.net/type/normal
     PokemonType.NORMAL: {'Snorlax': 'snorlax.jpg',     # https://pokemondb.net/pokedex/snorlax
                           'Meowth': 'meowth.jpg'},     # https://pokemondb.net/pokedex/meowth
