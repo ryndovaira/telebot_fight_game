@@ -5,6 +5,7 @@ from telebot import types
 from pokemon_combat.body_part import BodyPart
 from pokemon_combat.pokemon import Pokemon
 from pokemon_combat.pokemon_bot import PokemonBot
+from pokemon_combat.pokemon_by_type import pokemon_by_type
 from pokemon_combat.pokemon_type import PokemonType
 from pokemon_combat.state import State
 
@@ -56,21 +57,44 @@ def start_game(message):
 # True можно заменить на любое логическое условие (можно использовать данные из объекта call)
 @bot.callback_query_handler(func=lambda call: "pokemon_type_" in call.data)
 def query_handler(call):
+    pokemon_type_id = int(call.data.split('_')[2])  # TODO: Check type and errors
     bot.answer_callback_query(callback_query_id=call.id,
-                              text="Let's create your pokemon!")
+                              text="Let's choose your pokemon!")
 
     bot.send_message(call.message.chat.id,
-                     "Write your pokemon name:")  # TODO: Choose pokemon from the catalog
+                     "Choose a pokemon:")
 
-    pokemon_type_id = int(call.data.split('_')[2])  # TODO: Check type and errors
-    bot.register_next_step_handler(call.message, user_pokemon_name, pokemon_type=PokemonType(pokemon_type_id))
+    pokemons_with_chosen_type = pokemon_by_type.get(PokemonType(pokemon_type_id))
+
+    if len(pokemons_with_chosen_type) > 0:
+        for pokemon_name, pokemon_img in pokemons_with_chosen_type.items():
+            img = open(f"../images/{pokemon_img}", 'rb')
+            pokemon_markup = types.InlineKeyboardMarkup(
+                keyboard=[[types.InlineKeyboardButton(
+                    text=pokemon_name,
+                    callback_data=f"pokemon_name_{pokemon_name}_{pokemon_type_id}")]]
+            )
+            bot.send_photo(call.message.chat.id, img, reply_markup=pokemon_markup)
+    else:
+        # TODO: What if pokemons_with_chosen_type is empty?
+        ...
 
 
-def user_pokemon_name(message, pokemon_type: PokemonType):
+@bot.callback_query_handler(func=lambda call: "pokemon_name_" in call.data)
+def query_handler(call):
+    bot.answer_callback_query(callback_query_id=call.id,
+                              text="Pokemon has chosen!")
+    pokemon_name, pokemon_type_id = call.data.split('_')[2], int(call.data.split('_')[3])  # TODO: Check type and errors
+
+    create_user_and_rand_pokemons(call.message, pokemon_name=pokemon_name,
+                                  pokemon_type=PokemonType(pokemon_type_id))
+
+
+def create_user_and_rand_pokemons(message, pokemon_name: str, pokemon_type: PokemonType):
     global bot_state
     # {user_id: {'user_pokemon': pokemon_obj, 'rand_pokemon': rand_player_obj}}
     bot_state[message.from_user.id] = {
-        'user_pokemon': Pokemon(name=message.text,
+        'user_pokemon': Pokemon(name=pokemon_name,
                                 pokemon_type=pokemon_type),
         'rand_pokemon': PokemonBot()
     }
