@@ -23,12 +23,12 @@ class Pokemon:
         self.defense = defense_body_part
         self.attack = attack_body_part
 
-    def get_hit(self, opponent_attack_body_part: BodyPart, opponent_hit_power: int):
+    def get_hit(self, opponent_attack_body_part: BodyPart, opponent_hit_power: int, opponent_type: PokemonType):
         if self.defense == opponent_attack_body_part:
             return f"{opponent_attack_body_part} has defensed!"
         else:
-            # TODO: Use pokemon types
-            self.hp -= opponent_hit_power
+            # TODO: Add logic in hit power and types
+            self.hp -= opponent_hit_power * (2 if opponent_type in self.defence_weaknesses else 1)
             if self.hp > 0:
                 return f"Hurt but not defeated! HP: {self.hp}"
             else:
