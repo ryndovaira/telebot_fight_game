@@ -1,5 +1,6 @@
 from pokemon_combat.pokemon_type import PokemonType
 
+# https://pokemondb.net/pokedex/all
 pokemon_by_type = {
     # https://pokemondb.net/type/normal
     PokemonType.NORMAL: {'Snorlax': 'snorlax.jpg',     # https://pokemondb.net/pokedex/snorlax
@@ -31,35 +32,46 @@ pokemon_by_type = {
                            'Throh': 'throh.jpg'},       # https://pokemondb.net/pokedex/throh
 
     # https://pokemondb.net/type/poison
-    PokemonType.POISON: {},
+    PokemonType.POISON: {'Ekans': 'ekans.jpg',          # https://pokemondb.net/pokedex/ekans
+                         'Weezing': 'weezing.jpg'},     # https://pokemondb.net/pokedex/weezing
 
     # https://pokemondb.net/type/ground
-    PokemonType.GROUND: {},
+    PokemonType.GROUND: {'Dugtrio': 'dugtrio.jpg',      # https://pokemondb.net/pokedex/dugtrio
+                         'Marowak': 'marowak.jpg'},     # https://pokemondb.net/pokedex/marowak
 
     # https://pokemondb.net/type/flying
-    PokemonType.FLYING: {},
+    PokemonType.FLYING: {'Tornadus': 'tornadus-incarnate.jpg',  # https://pokemondb.net/pokedex/tornadus
+                         'Corvisquire': 'corvisquire.jpg'},     # https://pokemondb.net/pokedex/corvisquire
 
     # https://pokemondb.net/type/psychic
-    PokemonType.PSYCHIC: {},
+    PokemonType.PSYCHIC: {'Alakazam': 'alakazam.jpg',   # https://pokemondb.net/pokedex/alakazam
+                          'Mewtwo': 'mewtwo.jpg'},      # https://pokemondb.net/pokedex/mewtwo
 
     # https://pokemondb.net/type/bug
-    PokemonType.BUG: {},
+    PokemonType.BUG: {'Caterpie': 'caterpie.jpg',       # https://pokemondb.net/pokedex/caterpie
+                      'Pinsir': 'pinsir.jpg'},          # https://pokemondb.net/pokedex/pinsir
 
     # https://pokemondb.net/type/rock
-    PokemonType.ROCK: {},
+    PokemonType.ROCK: {'Sudowoodo': 'sudowoodo.jpg',    # https://pokemondb.net/pokedex/sudowoodo
+                       'Gigalith': 'gigalith.jpg'},     # https://pokemondb.net/pokedex/gigalith
 
     # https://pokemondb.net/type/ghost
-    PokemonType.GHOST: {},
+    PokemonType.GHOST: {'Misdreavus': 'misdreavus.jpg',     # https://pokemondb.net/pokedex/misdreavus
+                        'Duskull': 'duskull.jpg'},          # https://pokemondb.net/pokedex/duskull
 
     # https://pokemondb.net/type/dragon
-    PokemonType.DRAGON: {},
+    PokemonType.DRAGON: {'Haxorus': 'haxorus.jpg',      # https://pokemondb.net/pokedex/haxorus
+                         'Goodra': 'goodra.jpg'},       # https://pokemondb.net/pokedex/goodra
 
     # https://pokemondb.net/type/dark
-    PokemonType.DARK: {},
+    PokemonType.DARK: {'Umbreon': 'umbreon.jpg',        # https://pokemondb.net/pokedex/umbreon
+                       'Purrloin': 'purrloin.jpg'},     # https://pokemondb.net/pokedex/purrloin
 
     # https://pokemondb.net/type/steel
-    PokemonType.STEEL: {},
+    PokemonType.STEEL: {'Registeel': 'registeel.jpg',   # https://pokemondb.net/pokedex/registeel
+                        'Klinklang': 'klinklang.jpg'},  # https://pokemondb.net/pokedex/klinklang
 
     # https://pokemondb.net/type/fairy
-    PokemonType.FAIRY: {}
+    PokemonType.FAIRY: {'Clefable': 'clefable.jpg',         # https://pokemondb.net/pokedex/clefable
+                        'Aromatisse': 'aromatisse.jpg'}     # https://pokemondb.net/pokedex/aromatisse
 }
