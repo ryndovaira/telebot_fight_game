@@ -6,24 +6,24 @@ from pokemon_combat.pokemon_types_weaknesses import pokemon_defence_weaknesses_b
 from pokemon_combat.pokemon import Pokemon
 
 
-def test_init():
-    name = "Pika"
-    pokemon_type = PokemonType.ELECTRIC
-    pokemon = Pokemon(name=name, pokemon_type=pokemon_type)
-    assert pokemon.name == name
-    assert pokemon.type == pokemon_type
-    assert pokemon.defence_weaknesses == weaknesses[pokemon_type]
-    assert pokemon.level == 0
-    assert pokemon.hp == 100
-    assert pokemon.defense == BodyPart.NOTHING
-    assert pokemon.attack == BodyPart.NOTHING
-    assert pokemon.state == State.READY
-
-
-def test_str():
+class TestPokemonClass:
     name = "Pika"
     pokemon_type = PokemonType.ELECTRIC
 
-    pokemon = Pokemon(name=name, pokemon_type=pokemon_type)
+    def test_init(self):
+        pokemon = Pokemon(name=self.name, pokemon_type=self.pokemon_type)
+        assert pokemon.name == self.name
+        assert pokemon.type == self.pokemon_type
+        assert pokemon.defence_weaknesses == weaknesses[self.pokemon_type]
+        assert pokemon.level == 0
+        assert pokemon.hp == 100
+        assert pokemon.defense == BodyPart.NOTHING
+        assert pokemon.attack == BodyPart.NOTHING
+        assert pokemon.state == State.READY
 
-    assert str(pokemon) == f"Name: {name} | Type: {pokemon_type} | Level: 0 | HP: 100 | State: {State.READY}"
+    def test_str(self):
+        pokemon = Pokemon(name=self.name, pokemon_type=self.pokemon_type)
+
+        assert str(pokemon) == f"Name: {self.name} | Type: {self.pokemon_type}\n" \
+                               f"Level: 0 | HP: 100\n" \
+                               f"State: {State.READY}"
