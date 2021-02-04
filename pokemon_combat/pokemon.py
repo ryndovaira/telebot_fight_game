@@ -17,7 +17,7 @@ class Pokemon:
         self.state = State.READY
 
     def __str__(self):
-        return f"Name: {self.name} | Type: {self.type} | Level: {self.level} | HP: {self.hp} | State: {self.state}"
+        return f"Name: {self.name} | Type: {self.type}\nLevel: {self.level} | HP: {self.hp}\nState: {self.state}"
 
     def next_step(self, defense_body_part: BodyPart, attack_body_part: BodyPart):
         self.defense = defense_body_part
