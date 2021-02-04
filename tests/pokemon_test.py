@@ -12,6 +12,7 @@ class TestPokemonClass:
 
     def test_init(self):
         pokemon = Pokemon(name=self.name, pokemon_type=self.pokemon_type)
+
         assert pokemon.name == self.name
         assert pokemon.type == self.pokemon_type
         assert pokemon.defence_weaknesses == weaknesses[self.pokemon_type]

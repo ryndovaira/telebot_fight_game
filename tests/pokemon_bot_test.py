@@ -20,6 +20,7 @@ class TestPokemonBotClass:
 
     def test_init(self):
         pokemon_bot = PokemonBot()
+
         assert pokemon_bot.name == self.bot_name
         assert pokemon_bot.type == self.pokemon_type
         assert pokemon_bot.defence_weaknesses == weaknesses[self.pokemon_type]
