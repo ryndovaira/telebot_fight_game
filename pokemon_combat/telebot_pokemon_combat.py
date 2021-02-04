@@ -70,11 +70,16 @@ def start_game(message):
 def create_bot_pokemon(message):
     global bot_state
     # {user_id: {'user_pokemon': pokemon_obj, 'rand_pokemon': rand_player_obj}}
-    bot_state[message.from_user.id] = {'rand_pokemon': PokemonBot()}
+    random_pokemon = PokemonBot()
+    bot_state[message.from_user.id] = {'rand_pokemon': random_pokemon}
 
     bot.send_message(message.chat.id,
                      f"<b>Bot's choose</b>\n{bot_state[message.from_user.id]['rand_pokemon']}",
                      parse_mode='html')
+
+    random_pokemon_img = pokemon_by_type[random_pokemon.type][random_pokemon.name]
+    img = open(f"../images/{random_pokemon_img}", 'rb')
+    bot.send_photo(message.chat.id, img)
 
 
 # True можно заменить на любое логическое условие (можно использовать данные из объекта call)
@@ -109,18 +114,12 @@ def query_handler(call):
                               text="Pokemon has chosen!")
     pokemon_name, pokemon_type_id = call.data.split('_')[2], int(call.data.split('_')[3])  # TODO: Check type and errors
 
-    create_user_and_rand_pokemons(call, pokemon_name=pokemon_name,
-                                  pokemon_type=PokemonType(pokemon_type_id))
+    create_user_pokemon(call, pokemon_name=pokemon_name,
+                        pokemon_type=PokemonType(pokemon_type_id))
 
 
-def create_user_and_rand_pokemons(call, pokemon_name: str, pokemon_type: PokemonType):
+def create_user_pokemon(call, pokemon_name: str, pokemon_type: PokemonType):
     global bot_state
-    # {user_id: {'user_pokemon': pokemon_obj, 'rand_pokemon': rand_player_obj}}
-    # bot_state[message.from_user.id] = {
-    #     'user_pokemon': Pokemon(name=pokemon_name,
-    #                             pokemon_type=pokemon_type),
-    #     'rand_pokemon': PokemonBot()
-    # }
 
     bot_state[call.from_user.id].update({'user_pokemon': Pokemon(name=pokemon_name,
                                                                  pokemon_type=pokemon_type)})
@@ -128,11 +127,6 @@ def create_user_and_rand_pokemons(call, pokemon_name: str, pokemon_type: Pokemon
     bot.send_message(call.message.chat.id,
                      f"<b>Your choose</b>\n{bot_state[call.from_user.id]['user_pokemon']}",
                      parse_mode='html')
-
-    # bot.send_message(message.chat.id,
-    #                  f"<b>Bot's choose</b>\n{bot_state[message.from_user.id]['rand_pokemon']}",
-    #                  parse_mode='html')
-
     bot.send_message(call.message.chat.id, "Starting game...")
     game_next_step_defend(call.message)
 
@@ -173,7 +167,7 @@ def game_next_step(message, defenced_body_part: str):
                            attack_body_part=BodyPart[attack_body_part])
     rand_pokemon.next_step()
 
-    # TODO: player's pokemon is always the first attacker or not?
+    # player's pokemon is always the first attacker
     rand_pokemon_hit_comments = rand_pokemon.get_hit(opponent_attack_body_part=user_pokemon.attack,
                                                      opponent_hit_power=user_pokemon.hit_power,
                                                      opponent_type=user_pokemon.type)
