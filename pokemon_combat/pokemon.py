@@ -26,8 +26,8 @@ class Pokemon:
         if self.defense == opponent_attack_body_part:
             return f"{opponent_attack_body_part} has defensed!"
         else:
-            # TODO: Add logic in hit power and types
-            self.hp -= opponent_hit_power * (2 if opponent_type in self.defence_weaknesses else 1)
+            # TODO: Update logic in hit power and types
+            self.hp -= opponent_hit_power * (5 if opponent_type in self.defence_weaknesses else 1)
             if self.hp > 0:
                 return f"Hurt but not defeated! HP: {self.hp}"
             else:
