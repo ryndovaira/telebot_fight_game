@@ -9,10 +9,10 @@ class Pokemon:
         self.name = name  # имя покемона
         self.type = pokemon_type  # тип покемона (вода, огонь ...)
         self.defence_weaknesses = weaknesses[pokemon_type]      # слабости при защите для данного типа
-        self.hp = 100  # TODO: здоровье или очки жизни (hit points)
+        self.hp = 100  # здоровье / очки жизни (hit points)
         self.defense = BodyPart.NOTHING     # что защищаем?
         self.attack = BodyPart.NOTHING      # куда атакуем?
-        self.hit_power = 5    # TODO: рассчитать мощность удара
+        self.hit_power = 5    # базовая мощность удара
         self.state = State.READY
 
     def __str__(self):
@@ -26,7 +26,7 @@ class Pokemon:
         if self.defense == opponent_attack_body_part:
             return f"{opponent_attack_body_part} has defensed!"
         else:
-            # TODO: Update logic in hit power and types
+            # добавление мощности к удару, если покемон имеет преимущество по типу
             self.hp -= opponent_hit_power * (5 if opponent_type in self.defence_weaknesses else 1)
             if self.hp > 0:
                 return f"Hurt but not defeated! HP: {self.hp}"

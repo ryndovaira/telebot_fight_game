@@ -25,7 +25,7 @@ game_statistics = {}
 
 hideBoard = types.ReplyKeyboardRemove()
 
-# TODO: Save results
+# полный путь к файлу для статистики игр
 game_statistics_filename = 'game_statistics.pkl'
 
 
