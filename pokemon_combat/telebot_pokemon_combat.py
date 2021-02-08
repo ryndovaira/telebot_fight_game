@@ -1,4 +1,6 @@
 import configparser
+import pickle
+
 import telebot
 from telebot import types
 
@@ -18,7 +20,50 @@ bot = telebot.TeleBot(token)  # @My_very_long_username_bot
 # {user_id: {'user_pokemon': pokemon_obj, 'rand_pokemon': rand_player_obj}}
 bot_state = {}
 
+# {user_id: {'wins': 0, 'losses': 0, 'standoff': 0}}
+game_statistics = {}
+
 hideBoard = types.ReplyKeyboardRemove()
+
+# TODO: Save results
+game_statistics_filename = 'game_statistics.pkl'
+
+
+def load_statistics():
+    print('Load statistics... ', end='')
+
+    global game_statistics
+
+    try:
+        with open(game_statistics_filename, 'rb') as game_statistics_file:
+            game_statistics = pickle.load(game_statistics_file)
+    except FileNotFoundError:
+        print(f"Error! File {game_statistics_filename} not found!")
+    else:
+        print('Success!')
+
+
+def update_and_save_statistics(user_id, result: GameResult):
+    global game_statistics
+
+    if game_statistics.get(user_id) is None:
+        game_statistics[user_id] = {}
+
+    if result is GameResult.WIN:
+        game_statistics[user_id]['wins'] = game_statistics[user_id].get('wins', 0) + 1
+    elif result is GameResult.LOSE:
+        game_statistics[user_id]['losses'] = game_statistics[user_id].get('losses', 0) + 1
+    elif result is GameResult.STANDOFF:
+        game_statistics[user_id]['standoff'] = game_statistics[user_id].get('standoff', 0) + 1
+
+    # сохранять в историю только результаты (без прогресса)
+    with open(game_statistics_filename, 'wb') as game_statistics_file:
+        pickle.dump(game_statistics, game_statistics_file)
+
+
+@bot.message_handler(commands=['stats'])
+def print_stats(message):
+    bot.send_message(message.from_user.id, f'You stats:\n{game_statistics.get(message.from_user.id, "(empty)")}')
 
 
 @bot.message_handler(commands=['start'])
@@ -193,14 +238,23 @@ def game_next_step(message, defenced_body_part: str):
 
     if user_pokemon.state != State.READY and rand_pokemon.state == State.READY:
         bot.send_message(message.chat.id, "You lose...\n\n/start for a new game")
+
+        update_and_save_statistics(message.from_user.id, GameResult.LOSE)
+
     elif user_pokemon.state == State.READY and rand_pokemon.state != State.READY:
         bot.send_message(message.chat.id, "You win!\n\n/start for a new game")
-    elif user_pokemon.state == State.READY and rand_pokemon.state != State.READY:
+        update_and_save_statistics(message.from_user.id, GameResult.WIN)
+
+    elif user_pokemon.state != State.READY and rand_pokemon.state != State.READY:
         bot.send_message(message.chat.id, "Standoff!\n\n/start for a new game")
+        update_and_save_statistics(message.from_user.id, GameResult.STANDOFF)
+
     elif user_pokemon.state == State.READY and rand_pokemon.state == State.READY:
         game_next_step_defend(message)
 
 
 if __name__ == '__main__':
+    load_statistics()
+
     print('Starting bot...')
     bot.polling(none_stop=True, interval=0)
