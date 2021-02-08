@@ -24,7 +24,6 @@ class TestPokemonBotClass:
         assert pokemon_bot.name == self.bot_name
         assert pokemon_bot.type == self.pokemon_type
         assert pokemon_bot.defence_weaknesses == weaknesses[self.pokemon_type]
-        assert pokemon_bot.level == 0
         assert pokemon_bot.hp == 100
         assert pokemon_bot.defense == BodyPart.NOTHING
         assert pokemon_bot.attack == BodyPart.NOTHING
@@ -34,5 +33,5 @@ class TestPokemonBotClass:
         pokemon = PokemonBot()
 
         assert str(pokemon) == f"Name: {self.bot_name} | Type: {self.pokemon_type}\n" \
-                               f"Level: 0 | HP: 100\n" \
+                               f"HP: 100\n" \
                                f"State: {State.READY}"

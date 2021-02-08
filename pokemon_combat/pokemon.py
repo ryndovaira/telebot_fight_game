@@ -6,18 +6,17 @@ from pokemon_combat.pokemon_types_weaknesses import pokemon_defence_weaknesses_b
 
 class Pokemon:
     def __init__(self, name: str, pokemon_type: PokemonType) -> None:
-        self.level = 0  # TODO: как увеличивать уровни?
         self.name = name  # имя покемона
         self.type = pokemon_type  # тип покемона (вода, огонь ...)
         self.defence_weaknesses = weaknesses[pokemon_type]      # слабости при защите для данного типа
         self.hp = 100  # TODO: здоровье или очки жизни (hit points)
         self.defense = BodyPart.NOTHING     # что защищаем?
         self.attack = BodyPart.NOTHING      # куда атакуем?
-        self.hit_power = (self.level + 1) * 5    # TODO: рассчитать мощность удара
+        self.hit_power = 5    # TODO: рассчитать мощность удара
         self.state = State.READY
 
     def __str__(self):
-        return f"Name: {self.name} | Type: {self.type}\nLevel: {self.level} | HP: {self.hp}\nState: {self.state}"
+        return f"Name: {self.name} | Type: {self.type}\nHP: {self.hp}\nState: {self.state}"
 
     def next_step(self, defense_body_part: BodyPart, attack_body_part: BodyPart):
         self.defense = defense_body_part
