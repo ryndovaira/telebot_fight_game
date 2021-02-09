@@ -161,12 +161,17 @@ def query_handler(call):
 
 @bot.callback_query_handler(func=lambda call: "pokemon_name_" in call.data)
 def query_handler(call):
-    bot.answer_callback_query(callback_query_id=call.id,
-                              text="Pokemon has chosen!")
-    pokemon_name, pokemon_type_id = call.data.split('_')[2], int(call.data.split('_')[3])  # TODO: Check type and errors
+    call_data_split = call.data.split('_')
+    if len(call_data_split) < 3 or not call_data_split[3].isdigit():
+        bot.send_message(call.message.chat.id,
+                         "Sorry, something wrong!\nPlease reset session /start")
+    else:
+        bot.answer_callback_query(callback_query_id=call.id,
+                                  text="Pokemon has chosen!")
+        pokemon_name, pokemon_type_id = call_data_split[2], int(call_data_split[3])
 
-    create_user_pokemon(call, pokemon_name=pokemon_name,
-                        pokemon_type=PokemonType(pokemon_type_id))
+        create_user_pokemon(call, pokemon_name=pokemon_name,
+                            pokemon_type=PokemonType(pokemon_type_id))
 
 
 def create_user_pokemon(call, pokemon_name: str, pokemon_type: PokemonType):
