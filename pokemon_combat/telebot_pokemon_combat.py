@@ -63,12 +63,12 @@ def update_and_save_statistics(user_id, result: GameResult):
 
 @bot.message_handler(commands=['stats'])
 def print_stats(message):
-    bot.send_message(message.from_user.id, f'You stats:\n{game_statistics.get(message.from_user.id, "(empty)")}')
+    bot.send_message(message.chat.id, f'You stats:\n{game_statistics.get(message.chat.id, "(empty)")}')
 
 
 @bot.message_handler(commands=['start'])
 def new_member(message):
-    bot.send_message(message.from_user.id, f'Hi, {message.from_user.first_name}!')
+    bot.send_message(message.chat.id, f'Hi, {message.from_user.first_name}!')
 
     yes_no_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True,
                                                 one_time_keyboard=True,
@@ -117,10 +117,10 @@ def create_bot_pokemon(message):
     global bot_state
     # {user_id: {'user_pokemon': pokemon_obj, 'rand_pokemon': rand_player_obj}}
     random_pokemon = PokemonBot()
-    bot_state[message.from_user.id] = {'rand_pokemon': random_pokemon}
+    bot_state[message.chat.id] = {'rand_pokemon': random_pokemon}
 
     bot.send_message(message.chat.id,
-                     f"<b>Bot's choose</b>\n{bot_state[message.from_user.id]['rand_pokemon']}",
+                     f"<b>Bot's choose</b>\n{bot_state[message.chat.id]['rand_pokemon']}",
                      parse_mode='html')
 
     random_pokemon_img = pokemon_by_type[random_pokemon.type][random_pokemon.name]
@@ -170,21 +170,21 @@ def query_handler(call):
                                   text="Pokemon has chosen!")
         pokemon_name, pokemon_type_id = call_data_split[2], int(call_data_split[3])
 
-        create_user_pokemon(call, pokemon_name=pokemon_name,
+        create_user_pokemon(call.message, pokemon_name=pokemon_name,
                             pokemon_type=PokemonType(pokemon_type_id))
 
 
-def create_user_pokemon(call, pokemon_name: str, pokemon_type: PokemonType):
+def create_user_pokemon(message, pokemon_name: str, pokemon_type: PokemonType):
     global bot_state
 
-    bot_state[call.from_user.id].update({'user_pokemon': Pokemon(name=pokemon_name,
-                                                                 pokemon_type=pokemon_type)})
+    bot_state[message.chat.id].update({'user_pokemon': Pokemon(name=pokemon_name,
+                                                               pokemon_type=pokemon_type)})
 
-    bot.send_message(call.message.chat.id,
-                     f"<b>Your choose</b>\n{bot_state[call.from_user.id]['user_pokemon']}",
+    bot.send_message(message.chat.id,
+                     f"<b>Your choose</b>\n{bot_state[message.chat.id]['user_pokemon']}",
                      parse_mode='html')
-    bot.send_message(call.message.chat.id, "Starting game...")
-    game_next_step_defend(call.message)
+    bot.send_message(message.chat.id, "Starting game...")
+    game_next_step_defend(message)
 
 
 def game_next_step_defend(message):
