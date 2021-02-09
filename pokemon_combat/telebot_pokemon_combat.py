@@ -131,27 +131,32 @@ def create_bot_pokemon(message):
 # True можно заменить на любое логическое условие (можно использовать данные из объекта call)
 @bot.callback_query_handler(func=lambda call: "pokemon_type_" in call.data)
 def query_handler(call):
-    pokemon_type_id = int(call.data.split('_')[2])  # TODO: Check type and errors
-    bot.answer_callback_query(callback_query_id=call.id,
-                              text="Let's choose your pokemon!")
-
-    bot.send_message(call.message.chat.id,
-                     "Choose a pokemon:")
-
-    pokemons_with_chosen_type = pokemon_by_type.get(PokemonType(pokemon_type_id))
-
-    if len(pokemons_with_chosen_type) > 0:
-        for pokemon_name, pokemon_img in pokemons_with_chosen_type.items():
-            img = open(f"../images/{pokemon_img}", 'rb')
-            pokemon_markup = types.InlineKeyboardMarkup(
-                keyboard=[[types.InlineKeyboardButton(
-                    text=pokemon_name,
-                    callback_data=f"pokemon_name_{pokemon_name}_{pokemon_type_id}")]]
-            )
-            bot.send_photo(call.message.chat.id, img, reply_markup=pokemon_markup)
+    call_data_split = call.data.split('_')
+    if len(call_data_split) < 2 or not call_data_split[2].isdigit():
+        bot.send_message(call.message.chat.id,
+                         "Sorry, something wrong!\nPlease reset session /start")
     else:
-        # TODO: What if pokemons_with_chosen_type is empty?
-        ...
+        pokemon_type_id = int(call_data_split[2])
+        bot.answer_callback_query(callback_query_id=call.id,
+                                  text="Let's choose your pokemon!")
+
+        bot.send_message(call.message.chat.id,
+                         "Choose a pokemon:")
+
+        pokemons_with_chosen_type = pokemon_by_type.get(PokemonType(pokemon_type_id))
+
+        if len(pokemons_with_chosen_type) > 0:
+            for pokemon_name, pokemon_img in pokemons_with_chosen_type.items():
+                img = open(f"../images/{pokemon_img}", 'rb')
+                pokemon_markup = types.InlineKeyboardMarkup(
+                    keyboard=[[types.InlineKeyboardButton(
+                        text=pokemon_name,
+                        callback_data=f"pokemon_name_{pokemon_name}_{pokemon_type_id}")]]
+                )
+                bot.send_photo(call.message.chat.id, img, reply_markup=pokemon_markup)
+        else:
+            # TODO: What if pokemons_with_chosen_type is empty?
+            ...
 
 
 @bot.callback_query_handler(func=lambda call: "pokemon_name_" in call.data)
