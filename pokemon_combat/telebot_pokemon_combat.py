@@ -147,6 +147,7 @@ def query_handler(call):
 
         if len(pokemons_with_chosen_type) > 0:
             for pokemon_name, pokemon_img in pokemons_with_chosen_type.items():
+                # TODO: Check if file exists
                 img = open(f"../images/{pokemon_img}", 'rb')
                 pokemon_markup = types.InlineKeyboardMarkup(
                     keyboard=[[types.InlineKeyboardButton(
@@ -196,10 +197,20 @@ def game_next_step_defend(message):
                      "What pokemon's body part do you want to defend?",
                      reply_markup=body_part_keyboard)
 
-    bot.register_next_step_handler(message, game_next_step_attack)
+    # TODO: Check non-keyboard answer
+    bot.register_next_step_handler(message, game_get_defend_answer_and_next_step_attack)
 
 
-def game_next_step_attack(message):
+def game_get_defend_answer_and_next_step_attack(message):
+    if not BodyPart.has_item(message.text):
+        bot.send_message(message.chat.id,
+                         "You should use keyboard for an answer!")
+        game_next_step_defend(message)
+    else:
+        next_step_attack(message, defenced_body_part=message.text)
+
+
+def next_step_attack(message, defenced_body_part: str):
     body_part_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True,
                                                    one_time_keyboard=True)
     body_part_keyboard.row(*[types.KeyboardButton(body_part.name) for body_part in BodyPart])
@@ -208,59 +219,63 @@ def game_next_step_attack(message):
                      "What pokemon's body part do you want to attack?",
                      reply_markup=body_part_keyboard)
 
-    # TODO: Check non-keyboard answer
-    bot.register_next_step_handler(message, game_next_step, defenced_body_part=message.text)
+    bot.register_next_step_handler(message, game_next_step, defenced_body_part=defenced_body_part)
 
 
 def game_next_step(message, defenced_body_part: str):
-    attack_body_part = message.text
+    if not BodyPart.has_item(message.text):
+        bot.send_message(message.chat.id,
+                         "You should use keyboard for an answer!")
+        next_step_attack(message, defenced_body_part=defenced_body_part)
+    else:
+        attack_body_part = message.text
 
-    global bot_state
-    user_pokemon = bot_state[message.from_user.id]['user_pokemon']
-    rand_pokemon = bot_state[message.from_user.id]['rand_pokemon']
+        global bot_state
+        user_pokemon = bot_state[message.chat.id]['user_pokemon']
+        rand_pokemon = bot_state[message.chat.id]['rand_pokemon']
 
-    user_pokemon.next_step(defense_body_part=BodyPart[defenced_body_part],
-                           attack_body_part=BodyPart[attack_body_part])
-    rand_pokemon.next_step()
+        user_pokemon.next_step(defense_body_part=BodyPart[defenced_body_part],
+                               attack_body_part=BodyPart[attack_body_part])
+        rand_pokemon.next_step()
 
-    # player's pokemon is always the first attacker
-    rand_pokemon_hit_comments = rand_pokemon.get_hit(opponent_attack_body_part=user_pokemon.attack,
-                                                     opponent_hit_power=user_pokemon.hit_power,
-                                                     opponent_type=user_pokemon.type)
-    bot.send_message(message.chat.id,
-                     f"<b>Bot's pokemon</b>:\n{rand_pokemon_hit_comments}",
-                     parse_mode='html')
+        # player's pokemon is always the first attacker
+        rand_pokemon_hit_comments = rand_pokemon.get_hit(opponent_attack_body_part=user_pokemon.attack,
+                                                         opponent_hit_power=user_pokemon.hit_power,
+                                                         opponent_type=user_pokemon.type)
+        bot.send_message(message.chat.id,
+                         f"<b>Bot's pokemon</b>:\n{rand_pokemon_hit_comments}",
+                         parse_mode='html')
 
-    user_pokemon_hit_comments = user_pokemon.get_hit(opponent_attack_body_part=rand_pokemon.attack,
-                                                     opponent_hit_power=rand_pokemon.hit_power,
-                                                     opponent_type=user_pokemon.type)
-    bot.send_message(message.chat.id,
-                     f"<b>Your pokemon</b>:\n{user_pokemon_hit_comments}",
-                     parse_mode='html')
+        user_pokemon_hit_comments = user_pokemon.get_hit(opponent_attack_body_part=rand_pokemon.attack,
+                                                         opponent_hit_power=rand_pokemon.hit_power,
+                                                         opponent_type=user_pokemon.type)
+        bot.send_message(message.chat.id,
+                         f"<b>Your pokemon</b>:\n{user_pokemon_hit_comments}",
+                         parse_mode='html')
 
-    bot.send_message(message.chat.id,
-                     f"<b>Your pokemon</b>\n{user_pokemon}",
-                     parse_mode='html')
+        bot.send_message(message.chat.id,
+                         f"<b>Your pokemon</b>\n{user_pokemon}",
+                         parse_mode='html')
 
-    bot.send_message(message.chat.id,
-                     f"<b>Bot's pokemon</b>\n{rand_pokemon}",
-                     parse_mode='html')
+        bot.send_message(message.chat.id,
+                         f"<b>Bot's pokemon</b>\n{rand_pokemon}",
+                         parse_mode='html')
 
-    if user_pokemon.state != State.READY and rand_pokemon.state == State.READY:
-        bot.send_message(message.chat.id, "You lose...\n\n/start for a new game")
+        if user_pokemon.state != State.READY and rand_pokemon.state == State.READY:
+            bot.send_message(message.chat.id, "You lose...\n\n/start for a new game")
 
-        update_and_save_statistics(message.from_user.id, GameResult.LOSE)
+            update_and_save_statistics(message.chat.id, GameResult.LOSE)
 
-    elif user_pokemon.state == State.READY and rand_pokemon.state != State.READY:
-        bot.send_message(message.chat.id, "You win!\n\n/start for a new game")
-        update_and_save_statistics(message.from_user.id, GameResult.WIN)
+        elif user_pokemon.state == State.READY and rand_pokemon.state != State.READY:
+            bot.send_message(message.chat.id, "You win!\n\n/start for a new game")
+            update_and_save_statistics(message.chat.id, GameResult.WIN)
 
-    elif user_pokemon.state != State.READY and rand_pokemon.state != State.READY:
-        bot.send_message(message.chat.id, "Standoff!\n\n/start for a new game")
-        update_and_save_statistics(message.from_user.id, GameResult.STANDOFF)
+        elif user_pokemon.state != State.READY and rand_pokemon.state != State.READY:
+            bot.send_message(message.chat.id, "Standoff!\n\n/start for a new game")
+            update_and_save_statistics(message.chat.id, GameResult.STANDOFF)
 
-    elif user_pokemon.state == State.READY and rand_pokemon.state == State.READY:
-        game_next_step_defend(message)
+        elif user_pokemon.state == State.READY and rand_pokemon.state == State.READY:
+            game_next_step_defend(message)
 
 
 if __name__ == '__main__':
