@@ -14,3 +14,7 @@ class BodyPart(Enum):
     @classmethod
     def max_index(cls):
         return cls.LEGS.value
+
+    @classmethod
+    def has_item(cls, value):
+        return value in cls._member_names_
