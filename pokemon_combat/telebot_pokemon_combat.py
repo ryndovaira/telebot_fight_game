@@ -197,7 +197,6 @@ def game_next_step_defend(message):
                      "What pokemon's body part do you want to defend?",
                      reply_markup=body_part_keyboard)
 
-    # TODO: Check non-keyboard answer
     bot.register_next_step_handler(message, game_get_defend_answer_and_next_step_attack)
 
 
