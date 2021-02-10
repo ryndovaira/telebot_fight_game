@@ -81,31 +81,22 @@ def new_member(message):
                      "Do you want to start the game?",
                      reply_markup=yes_no_keyboard)
 
-    bot.register_next_step_handler(message, start_game)
+    bot.register_next_step_handler(message, start_game_answer)
 
 
-def start_game(message):
+def start_game_answer(message):
     if message.text == 'Yes':
-
-        create_bot_pokemon(message)
-
-        pokemon_markup_buttons = []
-        pokemon_markup_buttons_row = []
-        row_helper = 1
-        for pokemon_type in PokemonType:
-            pokemon_markup_buttons_row.append(types.InlineKeyboardButton(text=pokemon_type.name,
-                                                                         callback_data=f"pokemon_type_{pokemon_type.value}"))
-
-            if row_helper % 3 == 0:
-                pokemon_markup_buttons.append(pokemon_markup_buttons_row)
-                pokemon_markup_buttons_row = []
-
-            row_helper += 1
-
-        pokemon_markup = types.InlineKeyboardMarkup(pokemon_markup_buttons)
-        bot.send_message(message.chat.id,
-                         "Choose a pokemon type:",
-                         reply_markup=pokemon_markup)
+        try:
+            create_bot_pokemon(message)
+        except Exception as ex:
+            # Emoji https://apps.timwhitlock.info/emoji/tables/unicode
+            bot.send_message(message.chat.id,
+                             f"Error: {ex}\t\U0001F631\n"
+                             f"Sorry!\n"
+                             f"We'll fix it!\n"
+                             f"\U0000274CThe game is unavailable!\U0000274C")
+        else:
+            start_game(message)
 
     elif message.text == 'No':
         bot.send_message(message.chat.id,
@@ -116,10 +107,44 @@ def start_game(message):
                          "You must choose option on keyboard")
 
 
+def start_game(message, fail_pokemon_type=None, fail_pokemon_type_list=[]):
+
+    if fail_pokemon_type:
+        fail_pokemon_type_list.append(fail_pokemon_type)
+
+    pokemon_markup_buttons = []
+    pokemon_markup_buttons_row = []
+    row_helper = 1
+    row_button_size = 3
+
+    for pokemon_type in PokemonType:
+        if pokemon_type in fail_pokemon_type_list:
+            continue
+
+        pokemon_markup_buttons_row.append(types.InlineKeyboardButton(text=pokemon_type.name,
+                                                                     callback_data=f"pokemon_type_{pokemon_type.value}"))
+
+        if row_helper % row_button_size == 0:
+            pokemon_markup_buttons.append(pokemon_markup_buttons_row)
+            pokemon_markup_buttons_row = []
+
+        row_helper += 1
+
+    if pokemon_markup_buttons_row:
+        pokemon_markup_buttons.append(pokemon_markup_buttons_row)
+
+    pokemon_markup = types.InlineKeyboardMarkup(pokemon_markup_buttons)
+    bot.send_message(message.chat.id,
+                     "Choose a pokemon type:",
+                     reply_markup=pokemon_markup)
+
+
 def create_bot_pokemon(message):
     global bot_state
     # {user_id: {'user_pokemon': pokemon_obj, 'rand_pokemon': rand_player_obj}}
+
     random_pokemon = PokemonBot()
+
     bot_state[message.chat.id] = {'rand_pokemon': random_pokemon}
 
     bot.send_message(message.chat.id,
@@ -146,9 +171,10 @@ def query_handler(call):
         bot.send_message(call.message.chat.id,
                          "Choose a pokemon:")
 
-        pokemons_with_chosen_type = pokemon_by_type.get(PokemonType(pokemon_type_id))
+        chosen_pokemon_type = PokemonType(pokemon_type_id)
+        pokemons_with_chosen_type = pokemon_by_type.get(chosen_pokemon_type)
 
-        if len(pokemons_with_chosen_type) > 0:
+        if pokemons_with_chosen_type:
             for pokemon_name, pokemon_img in pokemons_with_chosen_type.items():
                 img_file_path = f"../images/{pokemon_img}"
                 if os.path.isfile(img_file_path):
@@ -162,8 +188,9 @@ def query_handler(call):
                 else:
                     print(f"File {img_file_path} doesn't exist!")
         else:
-            # TODO: What if pokemons_with_chosen_type is empty?
-            ...
+            bot.send_message(call.message.chat.id,
+                             'Sorry, there is no pokemon in this type!\nPlease, choose something else.')
+            start_game(call.message, fail_pokemon_type=chosen_pokemon_type)
 
 
 @bot.callback_query_handler(func=lambda call: "pokemon_name_" in call.data)
