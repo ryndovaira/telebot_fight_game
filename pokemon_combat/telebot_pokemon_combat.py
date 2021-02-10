@@ -1,4 +1,5 @@
 import configparser
+import os
 import pickle
 
 import telebot
@@ -11,6 +12,8 @@ from pokemon_combat.pokemon_by_type import pokemon_by_type
 from pokemon_combat.pokemon_type import PokemonType
 from pokemon_combat.state import State
 from pokemon_combat.game_result import GameResult
+
+# TODO: Add logging
 
 config = configparser.ConfigParser()
 config.read('telebot_config.ini')
@@ -147,14 +150,17 @@ def query_handler(call):
 
         if len(pokemons_with_chosen_type) > 0:
             for pokemon_name, pokemon_img in pokemons_with_chosen_type.items():
-                # TODO: Check if file exists
-                img = open(f"../images/{pokemon_img}", 'rb')
-                pokemon_markup = types.InlineKeyboardMarkup(
-                    keyboard=[[types.InlineKeyboardButton(
-                        text=pokemon_name,
-                        callback_data=f"pokemon_name_{pokemon_name}_{pokemon_type_id}")]]
-                )
-                bot.send_photo(call.message.chat.id, img, reply_markup=pokemon_markup)
+                img_file_path = f"../images/{pokemon_img}"
+                if os.path.isfile(img_file_path):
+                    img = open(img_file_path, 'rb')
+                    pokemon_markup = types.InlineKeyboardMarkup(
+                        keyboard=[[types.InlineKeyboardButton(
+                            text=pokemon_name,
+                            callback_data=f"pokemon_name_{pokemon_name}_{pokemon_type_id}")]]
+                    )
+                    bot.send_photo(call.message.chat.id, img, reply_markup=pokemon_markup)
+                else:
+                    print(f"File {img_file_path} doesn't exist!")
         else:
             # TODO: What if pokemons_with_chosen_type is empty?
             ...
