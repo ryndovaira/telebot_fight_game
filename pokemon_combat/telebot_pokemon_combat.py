@@ -65,9 +65,16 @@ def update_and_save_statistics(user_id, result: GameResult):
         pickle.dump(game_statistics, game_statistics_file)
 
 
-@bot.message_handler(commands=['stats'])
+@bot.message_handler(commands=['results'])
 def print_stats(message):
-    bot.send_message(message.chat.id, f'You stats:\n{game_statistics.get(message.chat.id, "(empty)")}')
+    user_results = game_statistics.get(message.chat.id)
+    if user_results:
+        user_results_str = ""
+        for res_type, res_count in user_results.items():
+            user_results_str += f"\n    {res_type}: {res_count}"
+    else:
+        user_results_str = "\n    (empty)"
+    bot.send_message(message.chat.id, f'You results:{user_results_str}')
 
 
 @bot.message_handler(commands=['start'])
@@ -288,17 +295,17 @@ def game_next_step(message, defenced_body_part: str):
 
 
 def check_players_state(user_pokemon, rand_pokemon, message):
+    commands_str = "\n\n/start for a new game\n/results for your results"
     if user_pokemon.state != State.READY and rand_pokemon.state == State.READY:
-        bot.send_message(message.chat.id, "\U0001F44EYou lose...\n\n/start for a new game")
-
+        bot.send_message(message.chat.id, f"\U0001F44EYou lose...{commands_str}")
         update_and_save_statistics(message.chat.id, GameResult.LOSE)
 
     elif user_pokemon.state == State.READY and rand_pokemon.state != State.READY:
-        bot.send_message(message.chat.id, "\U0001F44DYou win!\n\n/start for a new game")
+        bot.send_message(message.chat.id, f"\U0001F44DYou win!{commands_str}")
         update_and_save_statistics(message.chat.id, GameResult.WIN)
 
     elif user_pokemon.state != State.READY and rand_pokemon.state != State.READY:
-        bot.send_message(message.chat.id, "\U0001F91DStandoff!\n\n/start for a new game")
+        bot.send_message(message.chat.id, f"\U0001F91DStandoff!{commands_str}")
         update_and_save_statistics(message.chat.id, GameResult.STANDOFF)
 
     elif user_pokemon.state == State.READY and rand_pokemon.state == State.READY:
