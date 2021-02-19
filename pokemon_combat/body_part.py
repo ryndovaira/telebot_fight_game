@@ -1,8 +1,6 @@
 from enum import Enum, auto
 
 
-# TODO: User's names
-
 class BodyPart(Enum):
     NOTHING = auto()  # ничего (начальное состояние)
     HEAD = auto()  # голова
