@@ -15,8 +15,7 @@ from pokemon_combat.pokemon_type import PokemonType
 from pokemon_combat.state import State
 from pokemon_combat.game_result import GameResult
 
-# TODO: Read config in function
-
+# прочитать Токен из конфига
 config = configparser.ConfigParser()
 config.read('telebot_config.ini')
 token = config['telebot']['token']
@@ -294,27 +293,30 @@ def game_next_step(message, defenced_body_part: str):
                          f"<b>Bot's pokemon</b>\n{rand_pokemon}",
                          parse_mode='html')
 
-        if user_pokemon.state != State.READY and rand_pokemon.state == State.READY:
-            bot.send_message(message.chat.id, "You lose...\n\n/start for a new game")
+        check_players_state(user_pokemon, rand_pokemon, message)
 
-            update_and_save_statistics(message.chat.id, GameResult.LOSE)
 
-        elif user_pokemon.state == State.READY and rand_pokemon.state != State.READY:
-            bot.send_message(message.chat.id, "You win!\n\n/start for a new game")
-            update_and_save_statistics(message.chat.id, GameResult.WIN)
+def check_players_state(user_pokemon, rand_pokemon, message):
+    if user_pokemon.state != State.READY and rand_pokemon.state == State.READY:
+        bot.send_message(message.chat.id, "You lose...\n\n/start for a new game")
 
-        elif user_pokemon.state != State.READY and rand_pokemon.state != State.READY:
-            bot.send_message(message.chat.id, "Standoff!\n\n/start for a new game")
-            update_and_save_statistics(message.chat.id, GameResult.STANDOFF)
+        update_and_save_statistics(message.chat.id, GameResult.LOSE)
 
-        elif user_pokemon.state == State.READY and rand_pokemon.state == State.READY:
-            game_next_step_defend(message)
+    elif user_pokemon.state == State.READY and rand_pokemon.state != State.READY:
+        bot.send_message(message.chat.id, "You win!\n\n/start for a new game")
+        update_and_save_statistics(message.chat.id, GameResult.WIN)
+
+    elif user_pokemon.state != State.READY and rand_pokemon.state != State.READY:
+        bot.send_message(message.chat.id, "Standoff!\n\n/start for a new game")
+        update_and_save_statistics(message.chat.id, GameResult.STANDOFF)
+
+    elif user_pokemon.state == State.READY and rand_pokemon.state == State.READY:
+        game_next_step_defend(message)
 
 
 if __name__ == '__main__':
-    # TODO: Save logs in file
+    # настройка логирования
     logging.basicConfig(
-        # filename='fight_bot.log',
         level=logging.DEBUG,
         format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
