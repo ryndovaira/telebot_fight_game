@@ -156,7 +156,6 @@ def create_bot_pokemon(message):
     bot.send_photo(message.chat.id, img)
 
 
-# True можно заменить на любое логическое условие (можно использовать данные из объекта call)
 @bot.callback_query_handler(func=lambda call: "pokemon_type_" in call.data)
 def query_handler(call):
     call_data_split = call.data.split('_')
@@ -171,26 +170,30 @@ def query_handler(call):
         bot.send_message(call.message.chat.id,
                          "Choose a pokemon:")
 
-        chosen_pokemon_type = PokemonType(pokemon_type_id)
-        pokemons_with_chosen_type = pokemon_by_type.get(chosen_pokemon_type)
+        ask_to_chose_pokemon_by_typeid(pokemon_type_id, call.message)
 
-        if pokemons_with_chosen_type:
-            for pokemon_name, pokemon_img in pokemons_with_chosen_type.items():
-                img_file_path = f"../images/{pokemon_img}"
-                if os.path.isfile(img_file_path):
-                    img = open(img_file_path, 'rb')
-                    pokemon_markup = types.InlineKeyboardMarkup(
-                        keyboard=[[types.InlineKeyboardButton(
-                            text=pokemon_name,
-                            callback_data=f"pokemon_name_{pokemon_name}_{pokemon_type_id}")]]
-                    )
-                    bot.send_photo(call.message.chat.id, img, reply_markup=pokemon_markup)
-                else:
-                    logging.error(f"File {img_file_path} doesn't exist!")
-        else:
-            bot.send_message(call.message.chat.id,
-                             'Sorry, there is no pokemon in this type!\nPlease, choose something else.')
-            start_game(call.message, fail_pokemon_type=chosen_pokemon_type)
+
+def ask_to_chose_pokemon_by_typeid(pokemon_type_id, message):
+    chosen_pokemon_type = PokemonType(pokemon_type_id)
+    pokemons_with_chosen_type = pokemon_by_type.get(chosen_pokemon_type)
+
+    if pokemons_with_chosen_type:
+        for pokemon_name, pokemon_img in pokemons_with_chosen_type.items():
+            img_file_path = f"../images/{pokemon_img}"
+            if os.path.isfile(img_file_path):
+                img = open(img_file_path, 'rb')
+                pokemon_markup = types.InlineKeyboardMarkup(
+                    keyboard=[[types.InlineKeyboardButton(
+                        text=pokemon_name,
+                        callback_data=f"pokemon_name_{pokemon_name}_{pokemon_type_id}")]]
+                )
+                bot.send_photo(message.chat.id, img, reply_markup=pokemon_markup)
+            else:
+                logging.error(f"File {img_file_path} doesn't exist!")
+    else:
+        bot.send_message(message.chat.id,
+                         'Sorry, there is no pokemon in this type!\nPlease, choose something else.')
+        start_game(message, fail_pokemon_type=chosen_pokemon_type)
 
 
 @bot.callback_query_handler(func=lambda call: "pokemon_name_" in call.data)
@@ -274,40 +277,28 @@ def game_next_step(message, defenced_body_part: str):
         rand_pokemon_hit_comments = rand_pokemon.get_hit(opponent_attack_body_part=user_pokemon.attack,
                                                          opponent_hit_power=user_pokemon.hit_power,
                                                          opponent_type=user_pokemon.type)
-        bot.send_message(message.chat.id,
-                         f"<b>Bot's pokemon</b>:\n{rand_pokemon_hit_comments}",
-                         parse_mode='html')
+        bot.send_message(message.chat.id, f"<b>Bot's pokemon</b>:\n{rand_pokemon_hit_comments}", parse_mode='html')
 
         user_pokemon_hit_comments = user_pokemon.get_hit(opponent_attack_body_part=rand_pokemon.attack,
                                                          opponent_hit_power=rand_pokemon.hit_power,
                                                          opponent_type=user_pokemon.type)
-        bot.send_message(message.chat.id,
-                         f"<b>Your pokemon</b>:\n{user_pokemon_hit_comments}",
-                         parse_mode='html')
-
-        bot.send_message(message.chat.id,
-                         f"<b>Your pokemon</b>\n{user_pokemon}",
-                         parse_mode='html')
-
-        bot.send_message(message.chat.id,
-                         f"<b>Bot's pokemon</b>\n{rand_pokemon}",
-                         parse_mode='html')
+        bot.send_message(message.chat.id, f"<b>Your pokemon</b>:\n{user_pokemon_hit_comments}", parse_mode='html')
 
         check_players_state(user_pokemon, rand_pokemon, message)
 
 
 def check_players_state(user_pokemon, rand_pokemon, message):
     if user_pokemon.state != State.READY and rand_pokemon.state == State.READY:
-        bot.send_message(message.chat.id, "You lose...\n\n/start for a new game")
+        bot.send_message(message.chat.id, "\U0001F44EYou lose...\n\n/start for a new game")
 
         update_and_save_statistics(message.chat.id, GameResult.LOSE)
 
     elif user_pokemon.state == State.READY and rand_pokemon.state != State.READY:
-        bot.send_message(message.chat.id, "You win!\n\n/start for a new game")
+        bot.send_message(message.chat.id, "\U0001F44DYou win!\n\n/start for a new game")
         update_and_save_statistics(message.chat.id, GameResult.WIN)
 
     elif user_pokemon.state != State.READY and rand_pokemon.state != State.READY:
-        bot.send_message(message.chat.id, "Standoff!\n\n/start for a new game")
+        bot.send_message(message.chat.id, "\U0001F91DStandoff!\n\n/start for a new game")
         update_and_save_statistics(message.chat.id, GameResult.STANDOFF)
 
     elif user_pokemon.state == State.READY and rand_pokemon.state == State.READY:

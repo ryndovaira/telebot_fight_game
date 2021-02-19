@@ -24,13 +24,13 @@ class Pokemon:
 
     def get_hit(self, opponent_attack_body_part: BodyPart, opponent_hit_power: int, opponent_type: PokemonType):
         if self.defense == opponent_attack_body_part:
-            return f"{opponent_attack_body_part} has defensed!"
+            return f"\U0001F60E{opponent_attack_body_part.name} has defensed!"
         else:
             # добавление мощности к удару, если покемон имеет преимущество по типу
             self.hp -= opponent_hit_power * (5 if opponent_type in self.defence_weaknesses else 1)
             if self.hp > 0:
-                return f"Hurt but not defeated! HP: {self.hp}"
+                return f"\U0000270AHurt but not defeated! HP: {self.hp}"
             else:
                 self.state = State.DEFEATED
-                return f"Defeated!"
+                return f"\U0001F3F3Defeated!"
 
