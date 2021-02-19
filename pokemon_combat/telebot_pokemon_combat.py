@@ -1,7 +1,9 @@
 import configparser
 import os
 import pickle
+import logging
 
+# pip install pyTelegramBotAPI
 import telebot
 from telebot import types
 
@@ -13,7 +15,7 @@ from pokemon_combat.pokemon_type import PokemonType
 from pokemon_combat.state import State
 from pokemon_combat.game_result import GameResult
 
-# TODO: Add logging
+# TODO: Read config in function
 
 config = configparser.ConfigParser()
 config.read('telebot_config.ini')
@@ -33,7 +35,7 @@ game_statistics_filename = 'game_statistics.pkl'
 
 
 def load_statistics():
-    print('Load statistics... ', end='')
+    logging.info('Try to load statistics.')
 
     global game_statistics
 
@@ -41,9 +43,9 @@ def load_statistics():
         with open(game_statistics_filename, 'rb') as game_statistics_file:
             game_statistics = pickle.load(game_statistics_file)
     except FileNotFoundError:
-        print(f"Error! File {game_statistics_filename} not found!")
+        logging.warning(f"File {game_statistics_filename} not found!")
     else:
-        print('Success!')
+        logging.info('Success!')
 
 
 def update_and_save_statistics(user_id, result: GameResult):
@@ -108,7 +110,6 @@ def start_game_answer(message):
 
 
 def start_game(message, fail_pokemon_type=None, fail_pokemon_type_list=[]):
-
     if fail_pokemon_type:
         fail_pokemon_type_list.append(fail_pokemon_type)
 
@@ -186,7 +187,7 @@ def query_handler(call):
                     )
                     bot.send_photo(call.message.chat.id, img, reply_markup=pokemon_markup)
                 else:
-                    print(f"File {img_file_path} doesn't exist!")
+                    logging.error(f"File {img_file_path} doesn't exist!")
         else:
             bot.send_message(call.message.chat.id,
                              'Sorry, there is no pokemon in this type!\nPlease, choose something else.')
@@ -311,7 +312,16 @@ def game_next_step(message, defenced_body_part: str):
 
 
 if __name__ == '__main__':
+    # TODO: Save logs in file
+    logging.basicConfig(
+        # filename='fight_bot.log',
+        level=logging.DEBUG,
+        format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+    )
+
     load_statistics()
 
-    print('Starting bot...')
+    logging.info('Starting the bot...')
     bot.polling(none_stop=True, interval=0)
+    logging.info('The bot has stopped!')
