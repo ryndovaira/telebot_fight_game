@@ -23,7 +23,9 @@ class Pokemon:
         self.attack = attack_body_part
 
     def get_hit(self, opponent_attack_body_part: BodyPart, opponent_hit_power: int, opponent_type: PokemonType):
-        if self.defense == opponent_attack_body_part:
+        if opponent_attack_body_part == BodyPart.NOTHING:
+            return f"\U0001F607Opponent passes the stroke!"
+        elif self.defense == opponent_attack_body_part:
             return f"\U0001F60E{opponent_attack_body_part.name} has defensed!"
         else:
             # добавление мощности к удару, если покемон имеет преимущество по типу
