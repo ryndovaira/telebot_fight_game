@@ -1,4 +1,4 @@
-from pokemon_combat.state import State
+from pokemon_combat.pokemon_state import State
 from pokemon_combat.body_part import BodyPart
 from pokemon_combat.pokemon_type import PokemonType
 from pokemon_combat.pokemon_types_weaknesses import pokemon_defence_weaknesses_by_type as weaknesses

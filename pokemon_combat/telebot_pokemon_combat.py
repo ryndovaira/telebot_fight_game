@@ -12,7 +12,7 @@ from pokemon_combat.pokemon import Pokemon
 from pokemon_combat.pokemon_bot import PokemonBot
 from pokemon_combat.pokemon_by_type import pokemon_by_type
 from pokemon_combat.pokemon_type import PokemonType
-from pokemon_combat.state import State
+from pokemon_combat.pokemon_state import State
 from pokemon_combat.game_result import GameResult
 
 # прочитать Токен из конфига
