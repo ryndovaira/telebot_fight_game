@@ -16,5 +16,5 @@ class BodyPart(Enum):
         return cls.LEGS.value
 
     @classmethod
-    def has_item(cls, value):
-        return value in cls._member_names_
+    def has_item(cls, name):
+        return name in cls._member_names_
