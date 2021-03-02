@@ -22,7 +22,9 @@ class Pokemon:
         self.defense = defense_body_part
         self.attack = attack_body_part
 
-    def get_hit(self, opponent_attack_body_part: BodyPart, opponent_hit_power: int, opponent_type: PokemonType):
+    def get_hit(self, opponent_attack_body_part: BodyPart,
+                opponent_hit_power: int,
+                opponent_type: PokemonType):
         if opponent_attack_body_part == BodyPart.NOTHING:
             return f"\U0001F607Opponent passes the stroke!"
         elif self.defense == opponent_attack_body_part:

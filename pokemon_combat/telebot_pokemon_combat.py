@@ -78,7 +78,7 @@ def print_stats(message):
 
 
 @bot.message_handler(commands=['start'])
-def new_member(message):
+def new_game(message):
     bot.send_message(message.chat.id, f'Hi, {message.from_user.first_name}!')
 
     yes_no_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True,
