@@ -50,6 +50,8 @@ def load_statistics():
 def update_and_save_statistics(user_id, result: GameResult):
     global game_statistics
 
+    user_id = str(user_id)
+
     if game_statistics.get(user_id) is None:
         game_statistics[user_id] = {}
 
@@ -166,7 +168,7 @@ def create_bot_pokemon(message):
 @bot.callback_query_handler(func=lambda call: "pokemon_type_" in call.data)
 def query_handler(call):
     call_data_split = call.data.split('_')
-    if len(call_data_split) < 2 or not call_data_split[2].isdigit():
+    if len(call_data_split) < 3 or not call_data_split[2].isdigit():
         bot.send_message(call.message.chat.id,
                          "Sorry, something wrong!\nPlease reset session /start")
     else:
