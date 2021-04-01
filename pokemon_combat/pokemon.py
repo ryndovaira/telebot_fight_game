@@ -12,7 +12,7 @@ class Pokemon:
         self.hp = 100  # здоровье / очки жизни (hit points)
         self.defense = BodyPart.NOTHING     # что защищаем?
         self.attack = BodyPart.NOTHING      # куда атакуем?
-        self.hit_power = 5    # базовая мощность удара
+        self.hit_power = 15    # базовая мощность удара
         self.state = State.READY
 
     def __str__(self):
